@@ -4,11 +4,14 @@
   "description": "Simple leaderboard",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "serve -p 5000 public"
   },
   "author": "Tom Groshong <tom@groshong.software>",
   "license": "MIT",
   "devDependencies": {
     "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "serve": "^14.2.5"
   }
 }
