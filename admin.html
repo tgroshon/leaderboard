@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Leaderboard</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: white;
+        font-size: 2.5em;
+        margin-bottom: 40px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .panel {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+        margin-bottom: 30px;
+      }
+
+      h2 {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 1.5em;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333;
+        font-weight: 500;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-weight: 500;
+      }
+
+      .button:hover {
+        background: #5568d3;
+      }
+
+      .button-danger {
+        background: #e74c3c;
+      }
+
+      .button-danger:hover {
+        background: #c0392b;
+      }
+
+      .button-small {
+        padding: 8px 16px;
+        font-size: 0.9em;
+      }
+
+      .entries-list {
+        margin-top: 20px;
+      }
+
+      .entry-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        gap: 15px;
+      }
+
+      .entry-name {
+        flex: 1;
+        font-weight: 500;
+        font-size: 1.1em;
+      }
+
+      .entry-score {
+        font-weight: bold;
+        color: #764ba2;
+        font-size: 1.2em;
+        min-width: 60px;
+        text-align: center;
+      }
+
+      .entry-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .back-link {
+        text-align: center;
+        margin-top: 30px;
+      }
+
+      .back-link a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.1em;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: inline-block;
+        transition: background 0.3s;
+      }
+
+      .back-link a:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      .empty-message {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+        font-size: 1.1em;
+      }
+
+      .message {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+      }
+
+      .message-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .edit-mode {
+        background: #fff3cd;
+        border-color: #ffc107;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>� Admin Panel</h1>
+
+      <div class="panel">
+        <h2 id="form-title">Add New Entry</h2>
+        <div id="message"></div>
+        <form id="entry-form">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required />
+          </div>
+          <div class="form-group">
+            <label for="score">Score</label>
+            <input type="number" id="score" name="score" required />
+          </div>
+          <button type="submit" class="button" id="submit-btn">
+            Add Entry
+          </button>
+          <button
+            type="button"
+            class="button"
+            id="cancel-btn"
+            style="display: none; background: #95a5a6"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>Current Entries</h2>
+        <div id="entries-list" class="entries-list">
+          <div class="empty-message">No entries yet.</div>
+        </div>
+      </div>
+
+      <div class="back-link">
+        <a href="index.html">� Back to Leaderboard</a>
+      </div>
+    </div>
+
+    <script>
+      let editingIndex = null;
+
+      function loadEntries() {
+        const entriesList = document.getElementById("entries-list");
+        const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+
+        if (data.length === 0) {
+          entriesList.innerHTML =
+            '<div class="empty-message">No entries yet.</div>';
+          return;
+        }
+
+        // Sort by score descending for display
+        const sortedData = [...data].sort((a, b) => b.score - a.score);
+
+        entriesList.innerHTML = sortedData
+          .map((entry, displayIndex) => {
+            // Find the original index in unsorted array
+            const originalIndex = data.findIndex(
+              (e) => e.name === entry.name && e.score === entry.score,
+            );
+
+            return `
+                    <div class="entry-item">
+                        <div class="entry-name">${escapeHtml(entry.name)}</div>
+                        <div class="entry-score">${entry.score}</div>
+                        <div class="entry-actions">
+                            <button class="button button-small" onclick="editEntry(${originalIndex})">Edit</button>
+                            <button class="button button-small button-danger" onclick="deleteEntry(${originalIndex})">Delete</button>
+                        </div>
+                    </div>
+                `;
+          })
+          .join("");
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function showMessage(text, type = "success") {
+        const messageDiv = document.getElementById("message");
+        messageDiv.innerHTML = `<div class="message message-${type}">${text}</div>`;
+        setTimeout(() => {
+          messageDiv.innerHTML = "";
+        }, 3000);
+      }
+
+      document
+        .getElementById("entry-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value.trim();
+          const score = parseInt(document.getElementById("score").value);
+
+          if (!name || isNaN(score)) {
+            showMessage("Please enter valid name and score", "error");
+            return;
+          }
+
+          const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+
+          if (editingIndex !== null) {
+            // Update existing entry
+            data[editingIndex] = { name, score };
+            localStorage.setItem("leaderboard", JSON.stringify(data));
+            showMessage("Entry updated successfully!");
+            cancelEdit();
+          } else {
+            // Add new entry
+            data.push({ name, score });
+            localStorage.setItem("leaderboard", JSON.stringify(data));
+            showMessage("Entry added successfully!");
+          }
+
+          // Reset form
+          document.getElementById("entry-form").reset();
+          loadEntries();
+        });
+
+      function editEntry(index) {
+        const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+        const entry = data[index];
+
+        document.getElementById("name").value = entry.name;
+        document.getElementById("score").value = entry.score;
+        document.getElementById("form-title").textContent = "Edit Entry";
+        document.getElementById("submit-btn").textContent = "Update Entry";
+        document.getElementById("cancel-btn").style.display = "inline-block";
+
+        editingIndex = index;
+      }
+
+      function cancelEdit() {
+        editingIndex = null;
+        document.getElementById("entry-form").reset();
+        document.getElementById("form-title").textContent = "Add New Entry";
+        document.getElementById("submit-btn").textContent = "Add Entry";
+        document.getElementById("cancel-btn").style.display = "none";
+      }
+
+      document
+        .getElementById("cancel-btn")
+        .addEventListener("click", cancelEdit);
+
+      function deleteEntry(index) {
+        if (!confirm("Are you sure you want to delete this entry?")) {
+          return;
+        }
+
+        const data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+        data.splice(index, 1);
+        localStorage.setItem("leaderboard", JSON.stringify(data));
+
+        showMessage("Entry deleted successfully!");
+        loadEntries();
+      }
+
+      // Load entries on page load
+      loadEntries();
+    </script>
+  </body>
+</html>
