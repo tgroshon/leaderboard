@@ -220,6 +220,11 @@
         <div id="entries-list" class="entries-list">
           <div class="empty-message">No entries yet.</div>
         </div>
+        <div style="margin-top: 20px; text-align: center">
+          <button id="reset-btn" type="button" class="button button-danger">
+            Reset All Entries
+          </button>
+        </div>
       </div>
 
       <div class="back-link">
@@ -348,6 +353,24 @@
         showMessage("Entry deleted successfully!");
         loadEntries();
       }
+
+      function resetLeaderboard() {
+        if (
+          !confirm(
+            "Are you sure you want to delete ALL entries? This cannot be undone!",
+          )
+        ) {
+          return;
+        }
+
+        localStorage.setItem("leaderboard", JSON.stringify([]));
+        showMessage("All entries have been cleared!");
+        loadEntries();
+      }
+
+      document
+        .getElementById("reset-btn")
+        .addEventListener("click", resetLeaderboard);
 
       // Load entries on page load
       loadEntries();
