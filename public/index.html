@@ -6,34 +6,14 @@
     <meta name="theme-color" content="#667eea" />
     <title>Leaderboard</title>
     <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="main.css" />
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-          Cantarell, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 20px;
-      }
-
       .container {
         max-width: 800px;
-        margin: 0 auto;
-        padding: 40px 20px;
       }
 
       h1 {
-        text-align: center;
-        color: white;
         font-size: 3em;
-        margin-bottom: 40px;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
       }
 
       .leaderboard {
@@ -88,30 +68,8 @@
         color: #764ba2;
       }
 
-      .admin-link {
-        text-align: center;
-        margin-top: 30px;
-      }
-
-      .admin-link a {
-        color: white;
-        text-decoration: none;
-        font-size: 1.1em;
-        padding: 12px 24px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        display: inline-block;
-        transition: background 0.3s;
-      }
-
-      .admin-link a:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-
       .empty-message {
-        text-align: center;
         padding: 60px 20px;
-        color: #999;
         font-size: 1.2em;
       }
     </style>
@@ -124,7 +82,7 @@
           No entries yet. Add some from the admin page!
         </div>
       </div>
-      <div class="admin-link">
+      <div class="nav-link">
         <a href="admin.html">Admin Panel</a>
       </div>
     </div>
